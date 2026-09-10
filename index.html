@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rest Your Brain - Number Puzzle</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game {
+            background: white;
+            width: 350px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .number {
+            height: 80px;
+            border: none;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .number:hover {
+            background: #3730a3;
+        }
+
+        .empty {
+            background: #e5e7eb;
+            cursor: default;
+        }
+
+        button#restart {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            background: #111827;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+            min-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game">
+
+        <h1>🧠 Rest Your Brain</h1>
+
+        <p class="subtitle">Arrange numbers from 1 to 8</p>
+
+        <div class="info">
+            <span>Moves: <span id="moves">0</span></span>
+            <span>Time: <span id="time">0</span>s</span>
+        </div>
+
+        <div class="puzzle" id="puzzle"></div>
+
+        <button id="restart" onclick="startGame()">
+            🔄 Restart
+        </button>
+
+        <p id="message"></p>
+
+    </div>
+
+    <script>
+
+        let numbers = [];
+        let moves = 0;
+        let seconds = 0;
+        let timer;
+
+        // Start game
+        function startGame() {
+
+            clearInterval(timer);
+
+            numbers = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+
+            shuffle();
+
+            moves = 0;
+            seconds = 0;
+
+            document.getElementById("moves").textContent = moves;
+            document.getElementById("time").textContent = seconds;
+            document.getElementById("message").textContent = "";
+
+            drawPuzzle();
+
+            timer = setInterval(function() {
+                seconds++;
+                document.getElementById("time").textContent = seconds;
+            }, 1000);
+        }
+
+
+        // Randomly mix numbers
+        function shuffle() {
+
+            for (let i = numbers.length - 1; i > 0; i--) {
+
+                let j = Math.floor(Math.random() * (i + 1));
+
+                [numbers[i], numbers[j]] =
+                [numbers[j], numbers[i]];
+            }
+        }
+
+
+        // Display puzzle
+        function drawPuzzle() {
+
+            const puzzle = document.getElementById("puzzle");
+
+            puzzle.innerHTML = "";
+
+            numbers.forEach(function(number, index) {
+
+                const button = document.createElement("button");
+
+                button.classList.add("number");
+
+                if (number === 0) {
+
+                    button.classList.add("empty");
+                    button.textContent = "";
+
+                } else {
+
+                    button.textContent = number;
+
+                    button.onclick = function() {
+                        moveNumber(index);
+                    };
+                }
+
+                puzzle.appendChild(button);
+            });
+        }
+
+
+        // Move number
+        function moveNumber(index) {
+
+            const emptyIndex = numbers.indexOf(0);
+
+            const row = Math.floor(index / 3);
+            const col = index % 3;
+
+            const emptyRow = Math.floor(emptyIndex / 3);
+            const emptyCol = emptyIndex % 3;
+
+
+            // Check if number is next to empty box
+            const isAdjacent =
+                Math.abs(row - emptyRow) +
+                Math.abs(col - emptyCol) === 1;
+
+
+            if (isAdjacent) {
+
+                [numbers[index], numbers[emptyIndex]] =
+                [numbers[emptyIndex], numbers[index]];
+
+                moves++;
+
+                document.getElementById("moves").textContent = moves;
+
+                drawPuzzle();
+
+                checkWin();
+            }
+        }
+
+
+        // Check winning condition
+        function checkWin() {
+
+            const winningOrder =
+                [1, 2, 3, 4, 5, 6, 7, 8, 0];
+
+            const won =
+                numbers.every(function(number, index) {
+                    return number === winningOrder[index];
+                });
+
+
+            if (won) {
+
+                clearInterval(timer);
+
+                document.getElementById("message").textContent =
+                    "🎉 You Win! Great Brain!";
+
+            }
+        }
+
+
+        // Start game when page loads
+        startGame();
+
+    </script>
+
+</body>
+</html>
