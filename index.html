@@ -1,688 +1,1001 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Rest Your Brain - Number Puzzle</title>
+```
+<title>Rest Your Brain - Number Puzzle</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transition: background 0.4s ease;
+    }
+
+    .game {
+        width: 420px;
+        max-width: 100%;
+        padding: 28px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 25px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        animation: gameIn 0.6s ease;
+    }
+
+    @keyframes gameIn {
+        from {
+            opacity: 0;
+            transform: translateY(25px) scale(0.95);
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
 
-            background: linear-gradient(135deg, #667eea, #764ba2);
+    .brain {
+        font-size: 55px;
+        margin-bottom: 5px;
+        animation: brainFloat 2s infinite ease-in-out;
+    }
+
+    @keyframes brainFloat {
+        0%, 100% {
+            transform: translateY(0);
         }
 
+        50% {
+            transform: translateY(-7px);
+        }
+    }
+
+    h1 {
+        color: #1f2937;
+        font-size: 30px;
+        margin-bottom: 7px;
+    }
+
+    .subtitle {
+        color: #6b7280;
+        margin-bottom: 20px;
+    }
+
+    /* Level */
+    .level-box {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white;
+        padding: 10px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    /* Stats */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .stat {
+        background: #f3f4f6;
+        padding: 11px 4px;
+        border-radius: 12px;
+        transition: transform 0.2s;
+    }
+
+    .stat:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-title {
+        display: block;
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    /* Puzzle */
+    .puzzle {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        margin-bottom: 20px;
+    }
+
+    .number {
+        height: 82px;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white;
+        font-size: 27px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 5px 10px rgba(79, 70, 229, 0.25);
+        transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+        animation: tileIn 0.25s ease;
+    }
+
+    @keyframes tileIn {
+        from {
+            opacity: 0;
+            transform: scale(0.75);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .number:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 18px rgba(79, 70, 229, 0.35);
+    }
+
+    .number:active {
+        transform: scale(0.92);
+    }
+
+    .empty {
+        background: #e5e7eb;
+        box-shadow: none;
+        cursor: default;
+    }
+
+    .empty:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Buttons */
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .game-btn {
+        flex: 1;
+        border: none;
+        padding: 13px 10px;
+        border-radius: 12px;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .game-btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+    #restart {
+        background: #111827;
+    }
+
+    #themeBtn {
+        background: #4f46e5;
+    }
+
+    /* Message */
+    #message {
+        min-height: 30px;
+        margin-top: 18px;
+        font-size: 17px;
+        font-weight: bold;
+        color: #16a34a;
+    }
+
+    .win {
+        animation: winEffect 0.8s ease;
+    }
+
+    @keyframes winEffect {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .best {
+        margin-top: 5px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    /* Progress */
+    .progress-container {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
+
+    .progress {
+        height: 100%;
+        width: 0%;
+        background: #4f46e5;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    /* Dark Mode */
+    body.dark {
+        background: linear-gradient(135deg, #111827, #312e81);
+    }
+
+    body.dark .game {
+        background: #1f2937;
+    }
+
+    body.dark h1 {
+        color: white;
+    }
+
+    body.dark .subtitle,
+    body.dark .best {
+        color: #9ca3af;
+    }
+
+    body.dark .stat {
+        background: #374151;
+    }
+
+    body.dark .stat-title {
+        color: #d1d5db;
+    }
+
+    body.dark .stat-value {
+        color: white;
+    }
+
+    body.dark .empty {
+        background: #374151;
+    }
+
+    body.dark .progress-container {
+        background: #374151;
+    }
+
+    /* Mobile */
+    @media (max-width: 420px) {
         .game {
-            width: 390px;
-            max-width: 100%;
-            padding: 28px;
-            text-align: center;
-
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 25px;
-
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.25);
+            padding: 22px;
         }
 
         .brain {
-            font-size: 55px;
-            margin-bottom: 5px;
+            font-size: 45px;
         }
 
         h1 {
-            color: #1f2937;
-            font-size: 30px;
-            margin-bottom: 7px;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 22px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat {
-            background: #f3f4f6;
-            padding: 12px 5px;
-            border-radius: 12px;
-        }
-
-        .stat-title {
-            display: block;
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #111827;
-        }
-
-        .puzzle {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 9px;
-            margin-bottom: 20px;
+            font-size: 25px;
         }
 
         .number {
-            height: 82px;
-            border: none;
-            border-radius: 15px;
-
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
-
-            color: white;
-            font-size: 27px;
-            font-weight: bold;
-
-            cursor: pointer;
-
-            box-shadow: 0 5px 10px rgba(79, 70, 229, 0.25);
-
-            transition:
-                transform 0.15s,
-                box-shadow 0.15s,
-                background 0.2s;
+            height: 70px;
+            font-size: 23px;
         }
 
-        .number:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.35);
+        .stats {
+            gap: 5px;
         }
 
-        .number:active {
-            transform: scale(0.94);
+        .stat-value {
+            font-size: 16px;
         }
+    }
+</style>
+```
 
-        .empty {
-            background: #e5e7eb;
-            box-shadow: none;
-            cursor: default;
-        }
-
-        .empty:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .game-btn {
-            flex: 1;
-            border: none;
-            padding: 13px 10px;
-            border-radius: 12px;
-
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-
-            cursor: pointer;
-
-            transition: transform 0.2s;
-        }
-
-        .game-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        #restart {
-            background: #111827;
-        }
-
-        #themeBtn {
-            background: #4f46e5;
-        }
-
-        #message {
-            min-height: 28px;
-            margin-top: 18px;
-
-            font-size: 17px;
-            font-weight: bold;
-            color: #16a34a;
-        }
-
-        .best {
-            margin-top: 5px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        /* Dark Mode */
-
-        body.dark {
-            background: linear-gradient(135deg, #111827, #312e81);
-        }
-
-        body.dark .game {
-            background: #1f2937;
-        }
-
-        body.dark h1 {
-            color: white;
-        }
-
-        body.dark .subtitle,
-        body.dark .best {
-            color: #9ca3af;
-        }
-
-        body.dark .stat {
-            background: #374151;
-        }
-
-        body.dark .stat-title {
-            color: #d1d5db;
-        }
-
-        body.dark .stat-value {
-            color: white;
-        }
-
-        body.dark .empty {
-            background: #374151;
-        }
-
-        /* Mobile */
-
-        @media (max-width: 420px) {
-
-            .game {
-                padding: 22px;
-            }
-
-            .brain {
-                font-size: 45px;
-            }
-
-            h1 {
-                font-size: 25px;
-            }
-
-            .number {
-                height: 70px;
-                font-size: 23px;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
-    <div class="game">
+```
+<div class="game" id="game">
 
-        <div class="brain">🧠</div>
+    <div class="brain">🧠</div>
 
-        <h1>Rest Your Brain</h1>
+    <h1>Rest Your Brain</h1>
 
-        <p class="subtitle">
-            Arrange numbers from 1 to 8
-        </p>
+    <p class="subtitle">
+        Arrange numbers from 1 to 8
+    </p>
 
+    <!-- Level -->
+    <div class="level-box">
+        🎯 Level <span id="level">1</span> -
+        <span id="levelName">Easy</span>
+    </div>
 
-        <!-- Game Statistics -->
+    <!-- Statistics -->
+    <div class="stats">
 
-        <div class="stats">
-
-            <div class="stat">
-                <span class="stat-title">Moves</span>
-                <span class="stat-value" id="moves">0</span>
-            </div>
-
-            <div class="stat">
-                <span class="stat-title">Time</span>
-                <span class="stat-value">
-                    <span id="time">0</span>s
-                </span>
-            </div>
-
-            <div class="stat">
-                <span class="stat-title">Best</span>
-                <span class="stat-value" id="best">-</span>
-            </div>
-
+        <div class="stat">
+            <span class="stat-title">Moves</span>
+            <span class="stat-value" id="moves">0</span>
         </div>
 
-
-        <!-- Puzzle -->
-
-        <div class="puzzle" id="puzzle"></div>
-
-
-        <!-- Buttons -->
-
-        <div class="buttons">
-
-            <button
-                class="game-btn"
-                id="restart"
-                onclick="startGame()">
-                🔄 New Game
-            </button>
-
-            <button
-                class="game-btn"
-                id="themeBtn"
-                onclick="toggleTheme()">
-                🌙 Theme
-            </button>
-
+        <div class="stat">
+            <span class="stat-title">Time</span>
+            <span class="stat-value">
+                <span id="time">0</span>s
+            </span>
         </div>
 
+        <div class="stat">
+            <span class="stat-title">Score</span>
+            <span class="stat-value" id="score">0</span>
+        </div>
 
-        <p id="message"></p>
-
-        <p class="best">
-            Solve the puzzle with minimum moves!
-        </p>
+        <div class="stat">
+            <span class="stat-title">Best</span>
+            <span class="stat-value" id="best">-</span>
+        </div>
 
     </div>
 
+    <!-- Progress -->
+    <div class="progress-container">
+        <div class="progress" id="progress"></div>
+    </div>
 
-    <script>
+    <!-- Puzzle -->
+    <div class="puzzle" id="puzzle"></div>
 
-        let numbers = [];
+    <!-- Buttons -->
+    <div class="buttons">
 
-        let moves = 0;
+        <button
+            class="game-btn"
+            id="restart"
+            onclick="startGame()">
+            🔄 New Game
+        </button>
 
-        let seconds = 0;
+        <button
+            class="game-btn"
+            id="themeBtn"
+            onclick="toggleTheme()">
+            🌙 Theme
+        </button>
 
-        let timer;
+    </div>
 
-        let gameStarted = false;
+    <p id="message"></p>
 
+    <p class="best">
+        Solve with minimum moves and maximum score!
+    </p>
 
-        // -------------------------
-        // Start Game
-        // -------------------------
-
-        function startGame() {
-
-            clearInterval(timer);
-
-            moves = 0;
-
-            seconds = 0;
-
-            gameStarted = false;
-
-
-            document.getElementById("moves").textContent = moves;
-
-            document.getElementById("time").textContent = seconds;
-
-            document.getElementById("message").textContent = "";
-
-
-            /*
-                Start from solved puzzle
-                and make valid random moves.
-                This guarantees a solvable puzzle.
-            */
-
-            numbers = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+</div>
 
 
-            let previousEmpty = -1;
+<script>
 
-            let shuffleMoves = 100;
+    let numbers = [];
+    let moves = 0;
+    let seconds = 0;
+    let score = 0;
 
+    let timer;
+    let gameOver = false;
 
-            for (let i = 0; i < shuffleMoves; i++) {
+    let level = 1;
 
-                let emptyIndex = numbers.indexOf(0);
-
-                let possibleMoves = getPossibleMoves(emptyIndex);
-
-
-                // Avoid immediately reversing previous move
-
-                if (previousEmpty !== -1 && possibleMoves.length > 1) {
-
-                    possibleMoves =
-                        possibleMoves.filter(
-                            index => index !== previousEmpty
-                        );
-                }
+    const levelNames = [
+        "Easy",
+        "Medium",
+        "Hard",
+        "Expert"
+    ];
 
 
-                let randomIndex =
-                    possibleMoves[
-                        Math.floor(
-                            Math.random() * possibleMoves.length
-                        )
-                    ];
+    // -------------------------
+    // Sound System
+    // -------------------------
 
+    let audioContext;
 
-                [numbers[randomIndex], numbers[emptyIndex]] =
-                [numbers[emptyIndex], numbers[randomIndex]];
+    function playSound(type) {
 
+        try {
 
-                previousEmpty = emptyIndex;
+            if (!audioContext) {
+                audioContext =
+                    new (window.AudioContext ||
+                    window.webkitAudioContext)();
             }
 
+            const oscillator =
+                audioContext.createOscillator();
 
-            drawPuzzle();
+            const gain =
+                audioContext.createGain();
 
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
 
-            // Start timer
+            if (type === "move") {
+                oscillator.frequency.value = 450;
+            }
 
-            timer = setInterval(function () {
+            if (type === "win") {
+                oscillator.frequency.value = 700;
+            }
 
-                seconds++;
+            if (type === "level") {
+                oscillator.frequency.value = 900;
+            }
 
-                document.getElementById("time").textContent =
-                    seconds;
+            oscillator.type = "sine";
 
-            }, 1000);
+            gain.gain.setValueAtTime(
+                0.08,
+                audioContext.currentTime
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                audioContext.currentTime + 0.15
+            );
+
+            oscillator.start();
+
+            oscillator.stop(
+                audioContext.currentTime + 0.15
+            );
+
+        } catch (error) {
+            // Sound unavailable - game still works
         }
+    }
 
 
-        // -------------------------
-        // Get possible moves
-        // -------------------------
+    // -------------------------
+    // Start Game
+    // -------------------------
 
-        function getPossibleMoves(emptyIndex) {
+    function startGame() {
 
-            let movesList = [];
+        clearInterval(timer);
 
-            let row = Math.floor(emptyIndex / 3);
+        moves = 0;
+        seconds = 0;
+        score = 0;
 
-            let col = emptyIndex % 3;
+        gameOver = false;
 
+        document.getElementById("moves").textContent = moves;
+        document.getElementById("time").textContent = seconds;
+        document.getElementById("score").textContent = score;
+        document.getElementById("message").textContent = "";
 
-            // Up
+        updateLevelDisplay();
 
-            if (row > 0) {
+        document.getElementById("progress").style.width = "0%";
 
-                movesList.push(emptyIndex - 3);
-
-            }
-
-
-            // Down
-
-            if (row < 2) {
-
-                movesList.push(emptyIndex + 3);
-
-            }
+        numbers =
+            [1, 2, 3, 4, 5, 6, 7, 8, 0];
 
 
-            // Left
+        let previousEmpty = -1;
 
-            if (col > 0) {
-
-                movesList.push(emptyIndex - 1);
-
-            }
+        // Level difficulty
+        let shuffleMoves =
+            30 + (level * 25);
 
 
-            // Right
+        for (let i = 0; i < shuffleMoves; i++) {
 
-            if (col < 2) {
-
-                movesList.push(emptyIndex + 1);
-
-            }
-
-
-            return movesList;
-        }
-
-
-        // -------------------------
-        // Draw Puzzle
-        // -------------------------
-
-        function drawPuzzle() {
-
-            const puzzle =
-                document.getElementById("puzzle");
-
-
-            puzzle.innerHTML = "";
-
-
-            numbers.forEach(function (number, index) {
-
-                const button =
-                    document.createElement("button");
-
-
-                button.classList.add("number");
-
-
-                if (number === 0) {
-
-                    button.classList.add("empty");
-
-                    button.textContent = "";
-
-                }
-
-                else {
-
-                    button.textContent = number;
-
-
-                    button.onclick = function () {
-
-                        moveNumber(index);
-
-                    };
-
-                }
-
-
-                puzzle.appendChild(button);
-
-            });
-        }
-
-
-        // -------------------------
-        // Move Number
-        // -------------------------
-
-        function moveNumber(index) {
-
-            const emptyIndex =
+            let emptyIndex =
                 numbers.indexOf(0);
 
-
-            const possibleMoves =
+            let possibleMoves =
                 getPossibleMoves(emptyIndex);
 
 
-            if (possibleMoves.includes(index)) {
-
-
-                [numbers[index], numbers[emptyIndex]] =
-                [numbers[emptyIndex], numbers[index]];
-
-
-                moves++;
-
-
-                document.getElementById("moves").textContent =
-                    moves;
-
-
-                gameStarted = true;
-
-
-                drawPuzzle();
-
-
-                checkWin();
-            }
-        }
-
-
-        // -------------------------
-        // Check Win
-        // -------------------------
-
-        function checkWin() {
-
-            const winningOrder =
-                [1, 2, 3, 4, 5, 6, 7, 8, 0];
-
-
-            const won =
-                numbers.every(function (number, index) {
-
-                    return number === winningOrder[index];
-
-                });
-
-
-            if (won) {
-
-                clearInterval(timer);
-
-
-                document.getElementById("message").textContent =
-                    "🎉 You Win! Great Brain!";
-
-
-                saveBestScore();
-
-            }
-        }
-
-
-        // -------------------------
-        // Best Score
-        // -------------------------
-
-        function saveBestScore() {
-
-            let oldBest =
-                localStorage.getItem("restYourBrainBest");
-
-
             if (
-                oldBest === null ||
-                seconds < Number(oldBest)
+                previousEmpty !== -1 &&
+                possibleMoves.length > 1
             ) {
 
-                localStorage.setItem(
-                    "restYourBrainBest",
-                    seconds
-                );
+                possibleMoves =
+                    possibleMoves.filter(
+                        index => index !== previousEmpty
+                    );
 
             }
 
 
-            showBestScore();
+            let randomIndex =
+                possibleMoves[
+                    Math.floor(
+                        Math.random() *
+                        possibleMoves.length
+                    )
+                ];
+
+
+            [
+                numbers[randomIndex],
+                numbers[emptyIndex]
+            ] =
+            [
+                numbers[emptyIndex],
+                numbers[randomIndex]
+            ];
+
+
+            previousEmpty = emptyIndex;
         }
 
 
-        function showBestScore() {
-
-            let best =
-                localStorage.getItem("restYourBrainBest");
+        drawPuzzle();
 
 
-            if (best !== null) {
+        timer = setInterval(function () {
 
-                document.getElementById("best").textContent =
-                    best + "s";
+            seconds++;
 
-            }
+            document.getElementById("time").textContent =
+                seconds;
 
+        }, 1000);
+    }
+
+
+    // -------------------------
+    // Level Display
+    // -------------------------
+
+    function updateLevelDisplay() {
+
+        document.getElementById("level").textContent =
+            level;
+
+        document.getElementById("levelName").textContent =
+            levelNames[level - 1] || "Expert";
+    }
+
+
+    // -------------------------
+    // Get Possible Moves
+    // -------------------------
+
+    function getPossibleMoves(emptyIndex) {
+
+        let movesList = [];
+
+        let row =
+            Math.floor(emptyIndex / 3);
+
+        let col =
+            emptyIndex % 3;
+
+
+        if (row > 0) {
+            movesList.push(emptyIndex - 3);
+        }
+
+        if (row < 2) {
+            movesList.push(emptyIndex + 3);
+        }
+
+        if (col > 0) {
+            movesList.push(emptyIndex - 1);
+        }
+
+        if (col < 2) {
+            movesList.push(emptyIndex + 1);
         }
 
 
-        // -------------------------
-        // Dark Mode
-        // -------------------------
-
-        function toggleTheme() {
-
-            document.body.classList.toggle("dark");
+        return movesList;
+    }
 
 
-            if (document.body.classList.contains("dark")) {
+    // -------------------------
+    // Draw Puzzle
+    // -------------------------
 
-                localStorage.setItem(
-                    "restYourBrainTheme",
-                    "dark"
-                );
+    function drawPuzzle() {
+
+        const puzzle =
+            document.getElementById("puzzle");
+
+        puzzle.innerHTML = "";
+
+
+        numbers.forEach(function(number, index) {
+
+            const button =
+                document.createElement("button");
+
+
+            button.classList.add("number");
+
+
+            if (number === 0) {
+
+                button.classList.add("empty");
+
+                button.textContent = "";
 
             }
 
             else {
 
-                localStorage.setItem(
-                    "restYourBrainTheme",
-                    "light"
+                button.textContent = number;
+
+
+                button.onclick = function() {
+
+                    moveNumber(index);
+
+                };
+
+            }
+
+
+            puzzle.appendChild(button);
+
+        });
+    }
+
+
+    // -------------------------
+    // Move Number
+    // -------------------------
+
+    function moveNumber(index) {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        const emptyIndex =
+            numbers.indexOf(0);
+
+
+        const possibleMoves =
+            getPossibleMoves(emptyIndex);
+
+
+        if (possibleMoves.includes(index)) {
+
+
+            [
+                numbers[index],
+                numbers[emptyIndex]
+            ] =
+            [
+                numbers[emptyIndex],
+                numbers[index]
+            ];
+
+
+            moves++;
+
+
+            // Score
+            score += Math.max(
+                10,
+                100 - moves * 2
+            );
+
+
+            document.getElementById("moves").textContent =
+                moves;
+
+            document.getElementById("score").textContent =
+                score;
+
+
+            playSound("move");
+
+
+            updateProgress();
+
+
+            drawPuzzle();
+
+
+            checkWin();
+
+        }
+    }
+
+
+    // -------------------------
+    // Progress
+    // -------------------------
+
+    function updateProgress() {
+
+        let progress =
+            Math.min(
+                95,
+                moves * 2
+            );
+
+        document.getElementById("progress").style.width =
+            progress + "%";
+    }
+
+
+    // -------------------------
+    // Check Win
+    // -------------------------
+
+    function checkWin() {
+
+        const winningOrder =
+            [1, 2, 3, 4, 5, 6, 7, 8, 0];
+
+
+        const won =
+            numbers.every(function(number, index) {
+
+                return number === winningOrder[index];
+
+            });
+
+
+        if (won) {
+
+            gameOver = true;
+
+            clearInterval(timer);
+
+
+            // Time bonus
+            const timeBonus =
+                Math.max(
+                    100,
+                    1000 - seconds * 10
                 );
 
-            }
+
+            // Level bonus
+            const levelBonus =
+                level * 500;
+
+
+            score +=
+                timeBonus +
+                levelBonus;
+
+
+            document.getElementById("score").textContent =
+                score;
+
+
+            document.getElementById("progress").style.width =
+                "100%";
+
+
+            document.getElementById("message").textContent =
+                "🎉 You Win! Great Brain!";
+
+
+            document.getElementById("game")
+                .classList.add("win");
+
+
+            playSound("win");
+
+
+            saveBestScore();
+
+
+            // Next level
+            setTimeout(function() {
+
+                document.getElementById("game")
+                    .classList.remove("win");
+
+
+                if (level < 4) {
+
+                    level++;
+
+                    playSound("level");
+
+                    document.getElementById("message").textContent =
+                        "🚀 Level Up! Starting next level...";
+
+
+                    updateLevelDisplay();
+
+
+                    setTimeout(function() {
+                        startGame();
+                    }, 1200);
+
+                }
+                else {
+
+                    document.getElementById("message").textContent =
+                        "🏆 Expert Complete! Amazing Brain!";
+
+                }
+
+            }, 1000);
+
+        }
+    }
+
+
+    // -------------------------
+    // Best Score
+    // -------------------------
+
+    function saveBestScore() {
+
+        let oldBestScore =
+            localStorage.getItem(
+                "restYourBrainBestScore"
+            );
+
+
+        if (
+            oldBestScore === null ||
+            score > Number(oldBestScore)
+        ) {
+
+            localStorage.setItem(
+                "restYourBrainBestScore",
+                score
+            );
 
         }
 
 
-        // -------------------------
-        // Load Theme
-        // -------------------------
-
-        function loadTheme() {
-
-            let theme =
-                localStorage.getItem("restYourBrainTheme");
+        let oldBestTime =
+            localStorage.getItem(
+                "restYourBrainBestTime"
+            );
 
 
-            if (theme === "dark") {
+        if (
+            oldBestTime === null ||
+            seconds < Number(oldBestTime)
+        ) {
 
-                document.body.classList.add("dark");
-
-            }
+            localStorage.setItem(
+                "restYourBrainBestTime",
+                seconds
+            );
 
         }
 
-
-        // -------------------------
-        // Page Load
-        // -------------------------
-
-        loadTheme();
 
         showBestScore();
+    }
 
-        startGame();
 
-    </script>
+    function showBestScore() {
+
+        let bestScore =
+            localStorage.getItem(
+                "restYourBrainBestScore"
+            );
+
+
+        if (bestScore !== null) {
+
+            document.getElementById("best").textContent =
+                bestScore;
+
+        }
+
+    }
+
+
+    // -------------------------
+    // Dark Mode
+    // -------------------------
+
+    function toggleTheme() {
+
+        document.body.classList.toggle("dark");
+
+
+        if (
+            document.body.classList.contains("dark")
+        ) {
+
+            localStorage.setItem(
+                "restYourBrainTheme",
+                "dark"
+            );
+
+        }
+
+        else {
+
+            localStorage.setItem(
+                "restYourBrainTheme",
+                "light"
+            );
+
+        }
+    }
+
+
+    // -------------------------
+    // Load Theme
+    // -------------------------
+
+    function loadTheme() {
+
+        let theme =
+            localStorage.getItem(
+                "restYourBrainTheme"
+            );
+
+
+        if (theme === "dark") {
+
+            document.body.classList.add("dark");
+
+        }
+
+    }
+
+
+    // -------------------------
+    // Page Load
+    // -------------------------
+
+    loadTheme();
+
+    showBestScore();
+
+    updateLevelDisplay();
+
+    startGame();
+
+</script>
+```
 
 </body>
-</html>
 
+</html>
